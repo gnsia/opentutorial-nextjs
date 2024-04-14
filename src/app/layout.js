@@ -1,6 +1,8 @@
 import { Control } from "./Control";
 import "./globals.css";
 import Link from "next/link";
+import { myServerClient } from "../../utils/supabase/server";
+const supabase = myServerClient();
 
 export const metadata = {
   title: "WEB tutorial",
@@ -8,16 +10,17 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const resp = await fetch(process.env.NEXT_PUBLIC_API_URL+"topics", { next: { revalidate: 0 } });
-  const topics = await resp.json();
+
+  let { data: page, error } = await supabase.from('page').select('*');
+  
   return (
     <html>
       <body>
-        <h1><Link href="/">WEB</Link></h1>
+        <h1><Link href="/">공감 소프트</Link></h1>
         <ol>
-          {topics.map(topic => 
-            <li key={topic.id}>
-              <Link href={`/read/${topic.id}`}>{topic.title}</Link>
+          {page.map(p => 
+            <li key={p.id}>
+              <Link href={`/read/${p.id}`}>{p.title}</Link>
             </li>
           )}
         </ol>
