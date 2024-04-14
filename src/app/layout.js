@@ -2,7 +2,8 @@ import { Control } from "./Control";
 import "./globals.css";
 import Link from "next/link";
 import { myServerClient } from "../../utils/supabase/server";
-const supabase = myServerClient();
+
+export const revalidate = 0;
 
 export const metadata = {
   title: "WEB tutorial",
@@ -10,13 +11,13 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-
+  const supabase = myServerClient();
   let { data: page, error } = await supabase.from('page').select('*');
-  
+
   return (
     <html>
       <body>
-        <h1><Link href="/">공감 소프트</Link></h1>
+        <h1><Link href="/">공감</Link></h1>
         <ol>
           {page.map(p => 
             <li key={p.id}>

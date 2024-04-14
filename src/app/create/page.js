@@ -1,32 +1,29 @@
 "use client";
-
 import { useRouter } from "next/navigation";
+import { myServerClient } from "../../../utils/supabase/server";
 
 export default function Create() {
+    
     const router = useRouter();
+    const supabase = myServerClient();
+
+    const onSubmitHandler = async (e) => {
+        e.preventDefault();
+
+        const title = e.target.title.value;
+        const body = e.target.body.value;
+        const { data, error } = await supabase
+            .from('page')
+            .insert([
+                { title, body },
+            ]).select();
+        const id = data[0].id;
+        router.push(`/read/${id}`);
+        router.refresh();
+    }
+
     return (
-        <form onSubmit={(e) => {
-            e.preventDefault();
-            const title = e.target.title.value;
-            const body = e.target.body.value;
-            // console.log(`before fetch: title-${title} body-${body}`);
-            // console.log(JSON.stringify({title, body}));
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({title, body}),
-            }
-            fetch(process.env.NEXT_PUBLIC_API_URL+`topics`, options)
-                .then(res=>res.json())
-                .then(result=> {
-                    console.log(result);
-                    const lastId = result.id;
-                    router.push(`/read/${lastId}`);
-                    router.refresh();
-                })
-        }}>
+        <form onSubmit={e => onSubmitHandler(e)}>
             <h2>Create!</h2>
             <p>
                 <input type="text" name="title" placeholder="title" />
